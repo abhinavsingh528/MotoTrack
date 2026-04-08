@@ -3,23 +3,17 @@ import { getVehicles } from "../services/api";
 import { deleteVehicle, updatedVehicle } from "../services/api";
 
 
-const VehicleList = () => {
-    const [vehicles, setVehicles] = useState([]);
+const VehicleList = ({vehicles, fetchVehicles}) => {
+
     const [editId, setEditId] = useState(null);
     const [editName, setEditName] = useState("");
     const [editNumber, setEditNumber] = useState("");
 
 
-    useEffect(() => {fetchVehicles()}, []);
-
-    const fetchVehicles = async () => {
-        const data = await getVehicles();
-        setVehicles(data);
-    }
-
     const handleDelete = async (id) => {
         await deleteVehicle(id);
-        window.location.reload();
+        await fetchVehicles();
+        // window.location.reload();
     }
 
     const handleEdit = (v) => {
@@ -33,7 +27,8 @@ const VehicleList = () => {
             name: editName,
             number: editNumber,
         })
-        window.location.reload();
+        // window.location.reload();
+        await fetchVehicles();
     }
 
     return(

@@ -1,30 +1,22 @@
 import { useState } from "react";
 import { addVehicle } from "../services/api";
 
-const VehicleForm = () => {
+const VehicleForm = ({fetchVehicles}) => {
     const [name, setName] = useState("");
     const [number, setNumber] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("Form Submitted")
-
-        const data = {
-            name,
-            number, 
-            status: "active",
-        };
-
-        const res = await addVehicle(data);
-        console.log("Response", res)
-        window.location.reload();
+        await addVehicle({name, number});
+        await fetchVehicles();
 
         //clear input
         setName("");
         setNumber("");
 
-        alert("Vehicle Added✅")
+        
+        // alert("Vehicle Added✅")
     };
 
     return (<form onSubmit={handleSubmit}>

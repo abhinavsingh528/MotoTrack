@@ -17,3 +17,23 @@ export const addVehicle = async (data) => {
     });
     return res.json();
 };
+
+// Delete Vehicle
+export const deleteVehicle = async (id) => {
+    const res = await fetch(`${BASE_URL}/vehicles/${id}`, {
+        method: "DELETE",
+    })
+    return res.json();
+}
+
+// Update Vehicle
+export const updatedVehicle = async (id, data) => {
+    const res = await fetch(`${BASE_URL}/vehicles/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+    return res.json()
+}

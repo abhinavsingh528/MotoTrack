@@ -16,14 +16,14 @@ const VehicleForm = ({fetchVehicles}) => {
         setNumber("");
 
         
-        // alert("Vehicle Added✅")
+        alert("Vehicle Added✅")
     };
 
-    return (<form onSubmit={handleSubmit}>
-                <h2>Add Vehicle</h2>
-                <input type="text" name="" id="" onChange={(e) => setName(e.target.value)} placeholder="Vehicle Name" value={name} required/>
-                <input type="text" name="" id="" onChange={(e) => setNumber(e.target.value)} placeholder="Vehicle Number" value={number} required/>
-                <button type="submit">Add</button>
+    return (<form onSubmit={handleSubmit} className="bg-gray-600 p-6 rounded-2xl shadow-lg space-y-4">
+                <h2 className="text-xl font-semibold text-blue-300">Add Vehicle</h2>
+                <input type="text" className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" name="" id="" onChange={(e) => setName(e.target.value)} placeholder="Vehicle Name" value={name} required/>
+                <input type="text" className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" name="" id="" onChange={(e) => setNumber(e.target.value)} placeholder="Vehicle Number" value={number} required/>
+                <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 transition p-3 rounded-lg font-semibold">Add</button>
             </form>
     )
 }

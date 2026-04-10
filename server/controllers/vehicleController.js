@@ -3,9 +3,9 @@ const Vehicle = require("../models/Vehicle");
 // Add Vehicle
 exports.addVehicle = async (req, res) => {
     try{
-        console.log("BODY:", req.body)
-        const {name, number} = req.body;
-        const vehicle = new Vehicle({name, number});
+        // console.log("BODY:", req.body)
+        const {name, number, nextServiceDate} = req.body;
+        const vehicle = new Vehicle({name, number, nextServiceDate});
         await vehicle.save();
         res.status(201).json(vehicle);
     }
@@ -42,11 +42,32 @@ exports.deleteVehicle = async (req, res) => {
 exports.updateVehicle = async (req, res) => {
     try {
         const {id} = req.params;
-        const {name, number, staus} = req.body;
+        const {name, number, status} = req.body;
 
-        const updatedVehicle = await Vehicle.findByIdAndUpdate(id, {name, number, staus}, {new: true});
+        const updatedVehicle = await Vehicle.findByIdAndUpdate(id, {name, number, status}, {new: true});
         res.json(updatedVehicle)
     } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+}
+
+// Add Service 
+exports.addService = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const {cost, description} = req.body;
+        const vehicle = await Vehicle.findById(id);
+
+        vehicle.services.push({
+            cost, 
+            description,
+        })
+
+        await vehicle.save();
+
+        res.json(vehicle);
+    }
+    catch(error){
         res.status(500).json({message: error.message})
     }
 }

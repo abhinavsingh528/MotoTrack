@@ -37,3 +37,15 @@ export const updatedVehicle = async (id, data) => {
     });
     return res.json()
 }
+
+// Add Service
+export const addService = async (id, data) => {
+    const res = await fetch (`${BASE_URL}/vehicles/${id}/service`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+    return res.json();
+}

@@ -11,8 +11,20 @@ const vehicleSchema = new mongoose.Schema({
     },
     status: {
         type: String,
+        enum: ["active", "service", "completed"],
         default: "active",
     },
+    services: [
+        {
+            date: {
+                    type: Date,
+                    default: Date.now,
+                },
+            cost: Number,
+            description: String,
+        }
+    ],
+    nextServiceDate: Date,
 }, {timestamps: true});
 
 const Vehicle = mongoose.model("Vehicle", vehicleSchema);

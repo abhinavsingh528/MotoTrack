@@ -4,8 +4,8 @@ const Vehicle = require("../models/Vehicle");
 exports.addVehicle = async (req, res) => {
     try{
         // console.log("BODY:", req.body)
-        const {name, number, nextServiceDate} = req.body;
-        const vehicle = new Vehicle({name, number, nextServiceDate, userId: req.user.id,});
+        const { name, number, nextServiceDate, model, year, odometer, insuranceExpiry, pucExpiry } = req.body;
+        const vehicle = new Vehicle({name, number, nextServiceDate, model, year, odometer, insuranceExpiry, pucExpiry, userId: req.user.id,});
         await vehicle.save();
         res.status(201).json(vehicle);
     }
@@ -30,7 +30,7 @@ exports.getVehicles = async (req, res) => {
 exports.deleteVehicle = async (req, res) => {
     try {
         const {id} = req.params;
-        await Vehicle.findOne({ _id: id, userId: req.user.id });
+        await Vehicle.findOneAndDelete({ _id: id, userId: req.user.id });
 
         res.json({message: "Vehicle deleted"})
     } catch (error) {
@@ -42,9 +42,9 @@ exports.deleteVehicle = async (req, res) => {
 exports.updateVehicle = async (req, res) => {
     try {
         const {id} = req.params;
-        const {name, number, status} = req.body;
+        const { name, number, status, model, year, odometer, insuranceExpiry, pucExpiry } = req.body;
 
-        const updatedVehicle = await Vehicle.findOneAndUpdate({ _id: id, userId: req.user.id }, {name, number, status}, {new: true});
+        const updatedVehicle = await Vehicle.findOneAndUpdate({ _id: id, userId: req.user.id }, { name, number, status, model, year, odometer, insuranceExpiry, pucExpiry }, {new: true});
         res.json(updatedVehicle)
     } catch (error) {
         res.status(500).json({message: error.message})

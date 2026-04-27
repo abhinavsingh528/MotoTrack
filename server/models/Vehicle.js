@@ -14,6 +14,21 @@ const vehicleSchema = new mongoose.Schema({
         enum: ["active", "service", "completed"],
         default: "active",
     },
+    model: { 
+        type: String 
+    },
+    year: { 
+        type: Number 
+    },
+    odometer: {
+        type: Number, default: 0 
+    },
+    insuranceExpiry: { 
+        type: Date 
+    },
+    pucExpiry: { 
+        type: Date 
+    },
     services: [
         {
             date: {

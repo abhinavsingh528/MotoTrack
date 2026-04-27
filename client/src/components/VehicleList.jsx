@@ -2,11 +2,23 @@ import { useState } from "react";
 import { deleteVehicle, updatedVehicle, addService } from "../services/api";
 
 const VehicleList = ({ vehicles, fetchVehicles }) => {
+    const getExpiryStatus = (date) => {
+        if (!date) return null;
+        const today = new Date();
+        const expiry = new Date(date);
+        const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+        if (daysLeft < 0) return { label: "Expired ❌", color: "text-red-500" };
+        if (daysLeft <= 30) return { label: `Expires in ${daysLeft} days ⚠️`, color: "text-yellow-400" };
+        return { label: `Valid ✅ (${daysLeft} days)`, color: "text-green-400" };
+    };
     const [editId, setEditId] = useState(null);
     const [editName, setEditName] = useState("");
     const [editNumber, setEditNumber] = useState("");
     const [editStatus, setEditStatus] = useState("");
     const [serviceInputs, setServiceInputs] = useState({});
+    const [editModel, setEditModel] = useState("");
+    const [editYear, setEditYear] = useState("");
+    const [editOdometer, setEditOdometer] = useState("");
 
     const handleDelete = async (id) => {
         await deleteVehicle(id);
@@ -18,10 +30,20 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
         setEditName(v.name);
         setEditNumber(v.number);
         setEditStatus(v.status);
+        setEditModel(v.model || "");
+        setEditYear(v.year || "");
+        setEditOdometer(v.odometer || "");
     };
 
     const handleUpdate = async () => {
-        await updatedVehicle(editId, { name: editName, number: editNumber, status: editStatus });
+        await updatedVehicle(editId, {
+            name: editName,
+            number: editNumber,
+            status: editStatus,
+            model: editModel,
+            year: editYear,
+            odometer: editOdometer,
+        });
         setEditId(null);
         await fetchVehicles();
     };
@@ -44,14 +66,18 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
                 <div key={v._id} className="bg-gray-600 p-4 rounded-xl shadow-md flex justify-between items-center">
                     {editId === v._id ? (
                         <>
-                            <input type="text" className="w-1/4 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setEditName(e.target.value)} value={editName} />
-                            <input type="text" className="w-1/4 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setEditNumber(e.target.value)} value={editNumber} />
+                            <input type="text" className="w-1/4 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setEditName(e.target.value)} value={editName} placeholder="Name" />
+                            <input type="text" className="w-1/4 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setEditNumber(e.target.value)} value={editNumber} placeholder="Number" />
+                            <input type="text" className="w-1/4 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setEditModel(e.target.value)} value={editModel} placeholder="Model" />
+                            <input type="number" className="w-1/4 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setEditYear(e.target.value)} value={editYear} placeholder="Year" />
+                            <input type="number" className="w-1/4 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setEditOdometer(e.target.value)} value={editOdometer} placeholder="Odometer" />
                             <select className="bg-gray-700 text-white p-1 rounded" onChange={(e) => setEditStatus(e.target.value)} value={editStatus}>
                                 <option value="active">Active</option>
                                 <option value="service">In Service</option>
                                 <option value="completed">Completed</option>
                             </select>
-                            <button className="w-1/10 m-2 bg-blue-500 hover:bg-blue-600 transition p-3 rounded-lg font-semibold" onClick={handleUpdate}>Save</button>
+                            <button className="m-2 bg-blue-500 hover:bg-blue-600 transition p-3 rounded-lg font-semibold" onClick={handleUpdate}>Save</button>
+                            <button className="m-2 bg-gray-500 hover:bg-gray-600 transition p-3 rounded-lg font-semibold" onClick={() => setEditId(null)}>Cancel</button>
                         </>
                     ) : (
                         <>
@@ -61,6 +87,24 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
                                 <p className="text-sm text-gray-400">Status:
                                     <span className={`px-2 py-1 rounded text-sm font-semibold ${v.status === "active" ? "bg-green-600 text-green-100" : v.status === "service" ? "bg-yellow-600 text-yellow-100" : "bg-blue-600 text-blue-100"}`}>{v.status}</span>
                                 </p>
+                                {(v.model || v.year) && (
+                                    <p className="text-gray-400 text-sm">🚗 {v.model} {v.year}</p>
+                                )}
+                                {v.odometer > 0 && (
+                                    <p className="text-gray-400 text-sm">🛣️ Odometer: {v.odometer} km</p>
+                                )}
+                                <div className="mt-2 space-y-1">
+                                    {getExpiryStatus(v.insuranceExpiry) && (
+                                        <p className={`text-sm ${getExpiryStatus(v.insuranceExpiry).color}`}>
+                                            🛡️ Insurance: {getExpiryStatus(v.insuranceExpiry).label}
+                                        </p>
+                                    )}
+                                    {getExpiryStatus(v.pucExpiry) && (
+                                        <p className={`text-sm ${getExpiryStatus(v.pucExpiry).color}`}>
+                                            📋 PUC: {getExpiryStatus(v.pucExpiry).label}
+                                        </p>
+                                    )}
+                                </div>
                                 <p className={`${v.nextServiceDate && new Date(v.nextServiceDate) < new Date() ? "text-red-500" : "text-green-400"}`}>
                                     Next Service: {v.nextServiceDate ? new Date(v.nextServiceDate).toLocaleDateString() : "Not Set"} <br />
                                     {v.nextServiceDate ? (new Date(v.nextServiceDate) < new Date() ? "⚠️ Service Due" : "✅ All Good") : ""}

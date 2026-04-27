@@ -1,51 +1,25 @@
-const BASE_URL = "http://localhost:5000/api";
+import axios from "axios";
 
-// Get All Vehicles
-export const getVehicles = async () => {
-    const res = await fetch(`${BASE_URL}/vehicles`);
-    return res.json();
-};
+const API = axios.create({
+    baseURL: "http://localhost:5000/api",
+});
 
-// Add Vehicle
-export const addVehicle = async (data) => {
-    const res = await fetch(`${BASE_URL}/vehicles`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
-    return res.json();
-};
+// Attach token automatically to every request
+API.interceptors.request.use((req) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        req.headers.Authorization = `Bearer ${token}`;
+    }
+    return req;
+});
 
-// Delete Vehicle
-export const deleteVehicle = async (id) => {
-    const res = await fetch(`${BASE_URL}/vehicles/${id}`, {
-        method: "DELETE",
-    })
-    return res.json();
-}
+// Auth APIs
+export const registerUser = (data) => API.post("/auth/register", data);
+export const loginUser = (data) => API.post("/auth/login", data);
 
-// Update Vehicle
-export const updatedVehicle = async (id, data) => {
-    const res = await fetch(`${BASE_URL}/vehicles/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
-    return res.json()
-}
-
-// Add Service
-export const addService = async (id, data) => {
-    const res = await fetch (`${BASE_URL}/vehicles/${id}/service`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-    return res.json();
-}
+// Vehicle APIs — all use axios instance so token is always sent
+export const getVehicles = () => API.get("/vehicles");
+export const addVehicle = (data) => API.post("/vehicles", data);
+export const deleteVehicle = (id) => API.delete(`/vehicles/${id}`);
+export const updatedVehicle = (id, data) => API.put(`/vehicles/${id}`, data);
+export const addService = (id, data) => API.post(`/vehicles/${id}/service`, data);

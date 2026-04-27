@@ -1,4 +1,4 @@
-import {Chart as ChartJS, ArcElement, Tooltip, Legend, plugins} from "chart.js"
+import {Chart as ChartJS, ArcElement, Tooltip, Legend} from "chart.js"
 import {Pie} from "react-chartjs-2"
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -18,7 +18,12 @@ const StatusChart = ({vehicles}) => {
         ],
         
     }
-
+    if (vehicles.length === 0) return (
+        <div className="bg-gray-800 p-4 rounded-xl mt-4">
+            <h2 className="text-white">Vehicles by Status</h2>
+            <p className="text-gray-400 text-center">No data yet 🫙</p>
+        </div>
+    );
     return (
         <div className="bg-gray-800 p-4 rounded-xl mt-4">
             <h2 className="text-white">Vehicles by Status</h2>

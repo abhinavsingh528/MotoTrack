@@ -5,7 +5,7 @@ exports.addVehicle = async (req, res) => {
     try{
         // console.log("BODY:", req.body)
         const {name, number, nextServiceDate} = req.body;
-        const vehicle = new Vehicle({name, number, nextServiceDate});
+        const vehicle = new Vehicle({name, number, nextServiceDate, userId: req.user.id,});
         await vehicle.save();
         res.status(201).json(vehicle);
     }
@@ -18,7 +18,7 @@ exports.addVehicle = async (req, res) => {
 // Get All Vehicle
 exports.getVehicles = async (req, res) => {
     try{
-        const vehicles = await Vehicle.find();
+        const vehicles = await Vehicle.find({userId: req.user.id });
         res.json(vehicles);
     }
     catch(error){
@@ -30,7 +30,7 @@ exports.getVehicles = async (req, res) => {
 exports.deleteVehicle = async (req, res) => {
     try {
         const {id} = req.params;
-        await Vehicle.findByIdAndDelete(id);
+        await Vehicle.findOne({ _id: id, userId: req.user.id });
 
         res.json({message: "Vehicle deleted"})
     } catch (error) {
@@ -44,7 +44,7 @@ exports.updateVehicle = async (req, res) => {
         const {id} = req.params;
         const {name, number, status} = req.body;
 
-        const updatedVehicle = await Vehicle.findByIdAndUpdate(id, {name, number, status}, {new: true});
+        const updatedVehicle = await Vehicle.findOneAndUpdate({ _id: id, userId: req.user.id }, {name, number, status}, {new: true});
         res.json(updatedVehicle)
     } catch (error) {
         res.status(500).json({message: error.message})
@@ -56,7 +56,7 @@ exports.addService = async (req, res) => {
     try {
         const {id} = req.params;
         const {cost, description} = req.body;
-        const vehicle = await Vehicle.findById(id);
+        const vehicle = await Vehicle.findOne({ _id: id, userId: req.user.id });
 
         vehicle.services.push({
             cost, 

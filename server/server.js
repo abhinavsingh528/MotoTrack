@@ -3,7 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const vehicleRoutes = require("./routes/vehicleRoutes")
-
+const authRoutes = require("./routes/authRoutes")
 
 dotenv.config();
 connectDB();
@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/vehicles", vehicleRoutes)
+app.use("/api/auth", authRoutes)
 
 // test route
 app.get("/", (req, res) => {

@@ -15,10 +15,18 @@ const VehicleChart = ({vehicles}) => {
             }
         ]
     }
+    if (vehicles.length === 0) return (
+        <div className="bg-gray-800 p-4 rounded-xl">
+            <h2 className="text-white">Service Cost Chart</h2>
+            <p className="text-gray-400 text-center">No data yet 🫙</p>
+        </div>
+    );
     return(
         <div className="bg-gray-800 p-4 rounded-xl">
             <h2 className="text-white">Service Cost Chart</h2>
-            <Bar data={data} />
+            <div className="h-72">
+                <Bar data={data} options={{ maintainAspectRatio: false }} />
+            </div>
         </div>
     )
 }

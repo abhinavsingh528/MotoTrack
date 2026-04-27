@@ -15,7 +15,7 @@ const VehicleForm = ({fetchVehicles}) => {
         //clear input
         setName("");
         setNumber("");
-
+        setNextServiceDate("");
         
         alert("Vehicle Added✅")
     };
@@ -24,7 +24,7 @@ const VehicleForm = ({fetchVehicles}) => {
                 <h2 className="text-xl font-semibold text-blue-300">Add Vehicle</h2>
                 <input type="text" className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" name="" id="" onChange={(e) => setName(e.target.value)} placeholder="Vehicle Name" value={name} required/>
                 <input type="text" className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" name="" id="" onChange={(e) => setNumber(e.target.value)} placeholder="Vehicle Number" value={number} required/>
-                <input type="date" name="" onChange={(e) => setNextServiceDate(e.target.value)} id="" />
+                <input type="date" className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setNextServiceDate(e.target.value)} value={nextServiceDate}/>
                 <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 transition p-3 rounded-lg font-semibold">Add</button>
             </form>
     )

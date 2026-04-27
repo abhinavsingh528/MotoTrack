@@ -25,6 +25,10 @@ const vehicleSchema = new mongoose.Schema({
         }
     ],
     nextServiceDate: Date,
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }
 }, {timestamps: true});
 
 const Vehicle = mongoose.model("Vehicle", vehicleSchema);

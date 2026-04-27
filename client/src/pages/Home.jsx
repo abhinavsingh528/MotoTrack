@@ -4,6 +4,7 @@ import VehicleList from "../components/VehicleList";
 import VehicleForm from "../components/VehicleForm";
 import VehicleChart from "../components/VehicleChart";
 import StatusChart from "../components/StatusChart";
+import Navbar from "../components/Navbar";
 
 const Home = () => {
     const [vehicles, setVehicles] = useState([]);
@@ -14,9 +15,9 @@ const Home = () => {
     const fetchVehicles = async () => {
         try {
             setLoading(true);
-            const data = await getVehicles();
+            const res = await getVehicles();
             // console.log("Fetched:", data)
-            setVehicles([...data]);
+            setVehicles([...res.data]);
         } catch (error) {
             console.error("Failed to fetch vehicles:", error)
         } finally{
@@ -26,16 +27,17 @@ const Home = () => {
 
     useEffect(() => {fetchVehicles()}, []);
 
-    const fillteredVehicles = vehicles.filter((v) => {
+    const filteredVehicles = vehicles.filter((v) => {
         const matchesSearch = v.name.toLowerCase().includes(search.toLowerCase()) || v.number.toLowerCase().includes(search.toLowerCase());
         const matchesStatus = statusFilter === "all" || v.status === statusFilter;
         return matchesSearch && matchesStatus;
-    })
+    });
 
     return (
         <div className="min-h-screen bg-gray-900  text-white p-6">
-            <h1 className="text-3xl font-bold mb-6 text-red-500">MotoTrack 🚗</h1>
-            <div className="bg-gray-800 p-4 rounded-xl shadow-md mb-6">
+            <Navbar/>
+            
+            <div className="bg-gray-800 p-4 rounded-xl shadow-md mb-6 mt-6">
                 <VehicleForm fetchVehicles={fetchVehicles}/>
             </div>
             {/* Dashboard */}
@@ -74,12 +76,14 @@ const Home = () => {
             </div>
             <div className="bg-gray-800 p-4 rounded-xl shadow-md">
                 
-                {loading ? (<p>Loading vehicles...</p>) 
-                        : vehicles.length === 0 
-                        ? (<p className="text-gray-400">No vehicles added yet 🫙</p>) 
-                        : (<VehicleList vehicles={fillteredVehicles} fetchVehicles={fetchVehicles} />)
+                {loading ? (<p>Loading vehicles...</p>)
+                         : vehicles.length === 0
+                         ? (<p className="text-gray-400">No vehicles added yet 🫙</p>)
+                         : (<VehicleList vehicles={filteredVehicles} fetchVehicles={fetchVehicles} />)
                 }
-                {fillteredVehicles.length === 0 && (<p className="text-gray-400"> No vehicles match your search</p>)}
+                {filteredVehicles.length === 0 && vehicles.length > 0 && (
+                    <p className="text-gray-400">No vehicles match your search</p>
+                )}
             </div>
         </div>
     )

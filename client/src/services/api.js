@@ -23,3 +23,4 @@ export const addVehicle = (data) => API.post("/vehicles", data);
 export const deleteVehicle = (id) => API.delete(`/vehicles/${id}`);
 export const updatedVehicle = (id, data) => API.put(`/vehicles/${id}`, data);
 export const addService = (id, data) => API.post(`/vehicles/${id}/service`, data);
+export const addFuelLog = (id, data) => API.post(`/vehicles/${id}/fuel`, data);

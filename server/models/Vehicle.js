@@ -39,6 +39,26 @@ const vehicleSchema = new mongoose.Schema({
             description: String,
         }
     ],
+    fuelLogs: [
+        {
+            date: { 
+                type: Date,
+                default: Date.now 
+            },
+            liters: { 
+                type: Number, 
+                required: true 
+            },
+            cost: { 
+                type: Number, 
+                required: true 
+            },
+            odometer: { 
+                type: Number, 
+                required: true 
+            },
+        }
+    ],
     nextServiceDate: Date,
     userId: {
         type: mongoose.Schema.Types.ObjectId,

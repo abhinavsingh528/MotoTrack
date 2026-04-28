@@ -71,3 +71,23 @@ exports.addService = async (req, res) => {
         res.status(500).json({message: error.message})
     }
 }
+
+// Add Fuel Log
+exports.addFuelLog = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { liters, cost, odometer } = req.body;
+        const vehicle = await Vehicle.findOne({ _id: id, userId: req.user.id });
+        if (!vehicle) return res.status(404).json({ message: "Vehicle not found" });
+
+        vehicle.fuelLogs.push({ liters, cost, odometer });
+
+        // update odometer to latest reading
+        vehicle.odometer = odometer;
+
+        await vehicle.save();
+        res.json(vehicle);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

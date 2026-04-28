@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deleteVehicle, updatedVehicle, addService } from "../services/api";
+import { deleteVehicle, updatedVehicle, addService, addFuelLog } from "../services/api";
 
 const VehicleList = ({ vehicles, fetchVehicles }) => {
     const getExpiryStatus = (date) => {
@@ -19,6 +19,8 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
     const [editModel, setEditModel] = useState("");
     const [editYear, setEditYear] = useState("");
     const [editOdometer, setEditOdometer] = useState("");
+    const [fuelInputs, setFuelInputs] = useState({});
+    const [showFuel, setShowFuel] = useState({});
 
     const handleDelete = async (id) => {
         await deleteVehicle(id);
@@ -57,6 +59,28 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
         await addService(id, { cost, description });
         setServiceInputs((prev) => ({ ...prev, [id]: { cost: "", description: "" } }));
         await fetchVehicles();
+    };
+
+    const handleFuelInput = (id, field, value) => {
+        setFuelInputs((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+    };
+
+    const handleAddFuel = async (id) => {
+        const { liters = "", cost = "", odometer = "" } = fuelInputs[id] || {};
+        await addFuelLog(id, { liters, cost, odometer });
+        setFuelInputs((prev) => ({ ...prev, [id]: { liters: "", cost: "", odometer: "" } }));
+        await fetchVehicles();
+    };
+
+    const getMileage = (fuelLogs) => {
+        if (!fuelLogs || fuelLogs.length < 2) return null;
+        const sorted = [...fuelLogs].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const first = sorted[0];
+        const last = sorted[sorted.length - 1];
+        const totalKm = last.odometer - first.odometer;
+        const totalLiters = sorted.slice(1).reduce((sum, l) => sum + l.liters, 0);
+        if (totalLiters === 0) return null;
+        return (totalKm / totalLiters).toFixed(2);
     };
 
     return (
@@ -120,11 +144,80 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
                                             </div>
                                         ))}
                                     </div>
+                                    
                                 )}
+                                {/* Fuel Section */}
+                                <div className="mt-3">
+                                    <button
+                                        className="text-sm text-blue-400 hover:underline"
+                                        onClick={() => setShowFuel((prev) => ({ ...prev, [v._id]: !prev[v._id] }))}
+                                    >
+                                        {showFuel[v._id] ? "Hide Fuel Logs ▲" : "Show Fuel Logs ▼"}
+                                    </button>
+                                                            
+                                    {showFuel[v._id] && (
+                                        <div className="mt-2 bg-gray-700 p-3 rounded-lg">
+                                            <h4 className="text-sm font-semibold text-blue-300 mb-2">⛽ Fuel Logs</h4>
+                                    
+                                            {/* Mileage */}
+                                            {getMileage(v.fuelLogs) && (
+                                                <p className="text-green-400 text-sm mb-2">
+                                                    🏎️ Avg Mileage: {getMileage(v.fuelLogs)} km/L
+                                                </p>
+                                            )}
+                                
+                                            {/* Fuel log history */}
+                                            {v.fuelLogs && v.fuelLogs.length > 0 ? (
+                                                <div className="space-y-1 mb-3">
+                                                    {v.fuelLogs.map((f, index) => (
+                                                        <div key={index} className="text-sm text-gray-300 flex justify-between">
+                                                            <span>⛽ {f.liters}L — ₹{f.cost} — {f.odometer} km</span>
+                                                            <span>{new Date(f.date).toLocaleDateString()}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-gray-400 text-sm mb-2">No fuel logs yet</p>
+                                            )}
+                                
+                                            {/* Add fuel form */}
+                                            <div className="grid grid-cols-3 gap-2 mt-2">
+                                                <input
+                                                    type="number"
+                                                    className="p-2 rounded-lg bg-gray-600 text-white outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                                    placeholder="Liters"
+                                                    value={fuelInputs[v._id]?.liters || ""}
+                                                    onChange={(e) => handleFuelInput(v._id, "liters", e.target.value)}
+                                                />
+                                                <input
+                                                    type="number"
+                                                    className="p-2 rounded-lg bg-gray-600 text-white outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                                    placeholder="Cost (₹)"
+                                                    value={fuelInputs[v._id]?.cost || ""}
+                                                    onChange={(e) => handleFuelInput(v._id, "cost", e.target.value)}
+                                                />
+                                                <input
+                                                    type="number"
+                                                    className="p-2 rounded-lg bg-gray-600 text-white outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                                    placeholder="Odometer"
+                                                    value={fuelInputs[v._id]?.odometer || ""}
+                                                    onChange={(e) => handleFuelInput(v._id, "odometer", e.target.value)}
+                                                />
+                                            </div>
+                                            <button
+                                                className="mt-2 w-full bg-green-500 hover:bg-green-600 transition p-2 rounded-lg text-sm font-semibold"
+                                                onClick={() => handleAddFuel(v._id)}
+                                            >
+                                                ⛽ Add Fuel Log
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                                 <input type="number" className="w-1/3 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" placeholder="Cost" value={serviceInputs[v._id]?.cost || ""} onChange={(e) => handleServiceInput(v._id, "cost", e.target.value)} required/>
                                 <input type="text" className="w-1/3 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" placeholder="Description" value={serviceInputs[v._id]?.description || ""} onChange={(e) => handleServiceInput(v._id, "description", e.target.value)} required/>
                                 <button className="w-1/5 m-2 bg-blue-500 hover:bg-blue-600 transition p-3 rounded-lg font-semibold" onClick={() => handleAddService(v._id)}>Add Service</button>
                             </div>
+                            
                             <div className="space-x-2">
                                 <button className="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded" onClick={() => handleEdit(v)}>Edit</button>
                                 <button className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded ml-2" onClick={() => handleDelete(v._id)}>Delete</button>

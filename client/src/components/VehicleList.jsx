@@ -121,8 +121,8 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
                                         ))}
                                     </div>
                                 )}
-                                <input type="number" className="w-1/3 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" placeholder="Cost" value={serviceInputs[v._id]?.cost || ""} onChange={(e) => handleServiceInput(v._id, "cost", e.target.value)} />
-                                <input type="text" className="w-1/3 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" placeholder="Description" value={serviceInputs[v._id]?.description || ""} onChange={(e) => handleServiceInput(v._id, "description", e.target.value)} />
+                                <input type="number" className="w-1/3 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" placeholder="Cost" value={serviceInputs[v._id]?.cost || ""} onChange={(e) => handleServiceInput(v._id, "cost", e.target.value)} required/>
+                                <input type="text" className="w-1/3 m-2 p-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" placeholder="Description" value={serviceInputs[v._id]?.description || ""} onChange={(e) => handleServiceInput(v._id, "description", e.target.value)} required/>
                                 <button className="w-1/5 m-2 bg-blue-500 hover:bg-blue-600 transition p-3 rounded-lg font-semibold" onClick={() => handleAddService(v._id)}>Add Service</button>
                             </div>
                             <div className="space-x-2">

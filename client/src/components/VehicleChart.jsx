@@ -11,7 +11,8 @@ const VehicleChart = ({vehicles}) => {
                 label: "Total Cost",
                 data: vehicles.map(v => v.services?.reduce((sum, s) => sum + s.cost, 0)),
                 backgroundColor: "rgba(59,130,246,0.7)",
-                borderRadius: 8
+                borderRadius: 8,
+                barThickness: 40,
             }
         ]
     }
@@ -25,7 +26,10 @@ const VehicleChart = ({vehicles}) => {
         <div className="bg-gray-800 p-4 rounded-xl">
             <h2 className="text-white">Service Cost Chart</h2>
             <div className="h-72">
-                <Bar data={data} options={{ maintainAspectRatio: false }} />
+                <Bar data={data} options={{ maintainAspectRatio: false, scales: {
+                    x: { grid: { color: "rgba(255,255,255,0.1)" } },
+                    y: { grid: { color: "rgba(255,255,255,0.1)" } }
+                } }} />
             </div>
         </div>
     )

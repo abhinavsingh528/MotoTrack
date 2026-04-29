@@ -5,6 +5,9 @@ import VehicleForm from "../components/VehicleForm";
 import VehicleChart from "../components/VehicleChart";
 import StatusChart from "../components/StatusChart";
 import Navbar from "../components/Navbar";
+import MonthlyChart from "../components/MonthlyChart";
+import UpcomingServices from "../components/UpcomingServices";
+import RecentLogs from "../components/RecentLogs";
 
 const Home = () => {
     const [vehicles, setVehicles] = useState([]);
@@ -86,8 +89,12 @@ const Home = () => {
                     <h2 className="text-2xl text-white font-bold">{vehicles.length}</h2>
                 </div>
                 <div className="bg-gray-800 p-4 rounded-xl text-center">
-                    <p className="text-gray-400">Total Cost</p>
-                    <h2 className="text-2xl text-green-400 font-bold">{vehicles.reduce((sum, v) => sum + (v.services?.reduce((s, x) => s + x.cost, 0) || 0 ), 0)  }</h2>
+                    <p className="text-gray-400">Service Cost</p>
+                    <h2 className="text-2xl text-green-400 font-bold">₹{vehicles.reduce((sum, v) => sum + (v.services?.reduce((s, x) => s + (x.cost || 0), 0) || 0), 0)}</h2>
+                </div>
+                <div className="bg-gray-800 p-4 rounded-xl text-center">
+                    <p className="text-gray-400">Fuel Cost</p>
+                    <h2 className="text-2xl text-blue-400 font-bold">₹{vehicles.reduce((sum, v) => sum + (v.fuelLogs?.reduce((s, f) => s + (f.cost || 0), 0) || 0), 0)}</h2>
                 </div>
                 <div className="bg-gray-800 p-4 rounded-xl text-center">
                     <p className="text-gray-400">Total Services</p>
@@ -119,9 +126,16 @@ const Home = () => {
                     </div>
                 </div>
             )}
-            <div className="grid md:grid-cols-2 gap-6 mt-6 mb-6">
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 mb-6">
                 <VehicleChart vehicles={vehicles} />
                 <StatusChart vehicles={vehicles} />
+                <MonthlyChart vehicles={vehicles} />
+            </div>
+            {/* Upcoming Services + Recent Logs */}
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <UpcomingServices vehicles={vehicles} />
+                <RecentLogs vehicles={vehicles} />
             </div>
             <div>
                 <input type="text" placeholder="Search by name or number..." className="w-full p-3 mb-4 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-400" onChange={(e) => setSearch(e.target.value)} value={search} />

@@ -56,6 +56,14 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
 
     const handleAddService = async (id) => {
         const { cost = "", description = "" } = serviceInputs[id] || {};
+         if (!cost || !description) {
+            alert("Both cost and description are required!");
+            return;
+        }
+        if (cost <= 0) {
+            alert("Cost must be greater than 0!");
+            return;
+        }
         await addService(id, { cost, description });
         setServiceInputs((prev) => ({ ...prev, [id]: { cost: "", description: "" } }));
         await fetchVehicles();
@@ -67,6 +75,10 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
 
     const handleAddFuel = async (id) => {
         const { liters = "", cost = "", odometer = "" } = fuelInputs[id] || {};
+         if (!liters || !cost || !odometer) {
+            alert("Please fill all fuel fields!");
+            return;
+        }
         await addFuelLog(id, { liters, cost, odometer });
         setFuelInputs((prev) => ({ ...prev, [id]: { liters: "", cost: "", odometer: "" } }));
         await fetchVehicles();
@@ -74,12 +86,13 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
 
     const getMileage = (fuelLogs) => {
         if (!fuelLogs || fuelLogs.length < 2) return null;
-        const sorted = [...fuelLogs].sort((a, b) => new Date(a.date) - new Date(b.date));
-        const first = sorted[0];
-        const last = sorted[sorted.length - 1];
-        const totalKm = last.odometer - first.odometer;
+        const sorted = [...fuelLogs]
+            .filter(f => f.odometer > 0 && f.liters > 0)
+            .sort((a, b) => a.odometer - b.odometer); // sort by odometer not date
+        if (sorted.length < 2) return null;
+        const totalKm = sorted[sorted.length - 1].odometer - sorted[0].odometer;
         const totalLiters = sorted.slice(1).reduce((sum, l) => sum + l.liters, 0);
-        if (totalLiters === 0) return null;
+        if (totalLiters === 0 || totalKm <= 0) return null;
         return (totalKm / totalLiters).toFixed(2);
     };
 
@@ -133,13 +146,13 @@ const VehicleList = ({ vehicles, fetchVehicles }) => {
                                     Next Service: {v.nextServiceDate ? new Date(v.nextServiceDate).toLocaleDateString() : "Not Set"} <br />
                                     {v.nextServiceDate ? (new Date(v.nextServiceDate) < new Date() ? "⚠️ Service Due" : "✅ All Good") : ""}
                                 </p>
-                                <p>Total Cost: {v.services?.reduce((sum, s) => sum + s.cost, 0) || 0}</p>
+                                <p>Total Cost: &#8377;{v.services?.reduce((sum, s) => sum + s.cost, 0) || 0}</p>
                                 {v.services && v.services.length > 0 && (
                                     <div className="mt-3 bg-gray-700 p-2 rounded">
                                         <h4 className="text-sm font-semibold text-blue-300 mb-1">Service History</h4>
-                                        {v.services.map((s, index) => (
+                                        {v.services?.filter(s => s.cost || s.description).map((s, index) => (
                                             <div key={index} className="text-sm text-gray-300 flex justify-between">
-                                                <span>💰 {s.cost} - {s.description}</span>
+                                                <span>&#8377;{s.cost} - {s.description}</span>
                                                 <span>{new Date(s.date).toLocaleDateString()}</span>
                                             </div>
                                         ))}
